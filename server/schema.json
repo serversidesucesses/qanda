@@ -1,0 +1,50 @@
+{
+  "title": "Questions and Answers",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "number"
+    },
+    "question_body": {
+      "type": "string"
+    },
+    "question_date": {
+      "type": "string"
+    },
+    "asker_name": {
+      "type": "string"
+    },
+    "question_helpfulness": {
+      "type": "number"
+    },
+    "reported": {
+      "type": "boolean"
+    },
+    "answers": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "number"
+        },
+        "body": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "answerer_name": {
+          "type": "string"
+        },
+        "helpfulness": {
+          "type": "number"
+        },
+        "photos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
