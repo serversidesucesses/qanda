@@ -39,7 +39,7 @@ const getQuestionsForProduct = (req, res) => {
   FROM QUESTIONS left join answers on questions.id = answers.question_id
   WHERE QUESTIONS.PRODUCT_ID = $1)
   SELECT question_id, JSON_AGG(JSON_BUILD_OBJECT(
-                'question_id',question_id,
+                'question_id', question_id,
                 'question_body', BODY,
                 'asker_name', asker_name,
                 'question_helpfulness', 0,
@@ -86,34 +86,37 @@ const getAnswersForQuestion = (req, res) => {
   const questionId = parseInt(req.params.question_id);
   const page = parseInt(req.query.page) || 1;
   const count = parseInt(req.query.count) || 5;
+  console.log(req.params);
 
-  pool.query(`SELECT $1 AS question,
-      $3 AS page,
-      $2 AS count,
+  pool.query(`SELECT ${questionId} AS question,
+      ${page} AS page,
+      ${count} AS count,
       coalesce(json_agg(
         json_build_object(
-          'answer_id', answers.id,
+          'id', answers.id,
           'body', answers.body,
-          'date', answers.answer_date,
           'answerer_name', answers.answerer_name,
-          'helpfulness', answers.helpfulness,
+          'date_written', answers.date_written,
+          'helpfulness', answers.helpful,
           'photos', (SELECT coalesce(json_agg(
             json_build_object(
-              'id', answers_photos.id,
-              'url', answers_photos.url
+              'id', photos.id,
+              'url', photos.url
             )), '[]')
-            FROM answers_photos WHERE answers_photos.answer_id = answers.id
+            FROM photos WHERE photos.answer_id = answers.id
           )
         )
       ), '[]') AS results
     FROM answers
-    WHERE answers.question_id = $1 and answers.reported = false
-    OFFSET $4
-    LIMIT $2
+    WHERE answers.question_id = ${questionId}
+    OFFSET ${count * (page - 1)}
+    LIMIT ${count}
     ;
-  `, [questionId, count, page, (count * (page - 1))])
+  `)
+  .then(({ rows }) => res.status(200).json(rows))
   .catch(err => res.status(500).json(err))
 }
+//[questionId, count, page, (count * (page - 1))]
 
 //Adds a question for the given product. POST /qa/questions
 
@@ -123,11 +126,11 @@ const postQuestion = (req, res) => {
   const name = req.body.asker_name;
   const email = req.body.asker_email;
   const productId = req.query.product_id;
-  // const date = // ??
+  const date = date.now();
   const reported = 0;
   const helpful = 0;
 
-  pool.query(`INSERT INTO questions (product_id, body, asker_name, asker_email, reported, helpful) VALUES ($1, $2, $3, $4, $5, $6)`, [productId, body, name, email, reported, helpful])
+  pool.query(`INSERT INTO questions (product_id, body, asker_name, asker_email, reported, helpful, date_written) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [productId, body, name, email, reported, helpful, date])
   .catch(err => res.status(500).json(err));
 }
 
