@@ -21,6 +21,7 @@ const getQuestionsForProduct = (req, res) => {
     QUESTIONS.BODY,
     QUESTIONS.ASKER_NAME,
     QUESTIONS.DATE_WRITTEN,
+    QUESTIONS.ASKER_EMAIL,
     (SELECT (JSON_OBJECT_AGG
         (ANSWERS.ID,JSON_BUILD_OBJECT(
             'id',ANSWERS.ID,
@@ -42,6 +43,7 @@ const getQuestionsForProduct = (req, res) => {
                 'question_id', question_id,
                 'question_body', BODY,
                 'asker_name', asker_name,
+                'asker_email', asker_email,
                 'question_helpfulness', 0,
                 'date_written', (SELECT TO_CHAR(to_timestamp(date_written / 1000), 'YYYY-MM-DD"T"HH24:MI:SS:000"Z"')),
                 'reported', 0,
@@ -121,16 +123,17 @@ const getAnswersForQuestion = (req, res) => {
 //Adds a question for the given product. POST /qa/questions
 
 const postQuestion = (req, res) => {
-  console.log(date.now());
-  const body = req.body.body;
+  console.log(req.body);
+  const body = req.body.question_body;
   const name = req.body.asker_name;
   const email = req.body.asker_email;
-  const productId = req.query.product_id;
-  const date = new Date();
+  const productId = req.body.product_id;
+  var date = Date.now();
   const reported = 0;
   const helpful = 0;
 
-  pool.query(`INSERT INTO questions (product_id, body, asker_name, asker_email, reported, helpful, date_written) VALUES ($1, $2, $3, $4, $5, $6, ${+new Date()}))`, [productId, body, name, email, reported, helpful])
+  pool.query(`INSERT INTO questions (product_id, body, asker_name, asker_email, reported, helpful, date_written) VALUES ($1, $2, $3, $4, $5, $6, $7)`, [productId, body, name, email, reported, helpful, date])
+  .then((result) => res.sendStatus(201))
   .catch(err => res.status(500).json(err));
 }
 
