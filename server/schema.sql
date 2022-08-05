@@ -36,8 +36,8 @@ ALTER TABLE answers
   REFERENCES photos (id) ON DELETE SET NULL ON UPDATE CASCADE;
 
 
---copy answers(id,question_id,body,date_written,answerer_name,answerer_email,reported,helpful) FROM '/Users/isabellesmith/Downloads/answers.csv' csv header;
+\copy answers(id,question_id,body,date_written,answerer_name,answerer_email,reported,helpful) FROM '/home/ubuntu/answers.csv' csv header;
 
---copy questions(id,product_id,body,date_written,asker_name,asker_email,reported,helpful) FROM '/Users/isabellesmith/Downloads/questions.csv' csv header;
+\copy questions(id,product_id,body,date_written,asker_name,asker_email,reported,helpful) FROM '/home/ubuntu/questions.csv' csv header;
 
---copy photos(id,answer_id,url) FROM '/Users/isabellesmith/Downloads/answers_photos.csv' csv header;
+\copy photos(id,answer_id,url) FROM '/home/ubuntu/answers_photos.csv' csv header;

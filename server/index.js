@@ -55,32 +55,6 @@ const getQuestionsForProduct = (req, res) => {
   .then(({ rows }) => res.status(200).json(rows))
   .catch(err => res.status(500).json(err))
 }
-// add 'date', date ^
-// WITH QUESTIONANSWER AS
-// (SELECT QUESTIONS.ID AS question_id,
-//   QUESTIONS.BODY,
-//   QUESTIONS.ASKER_NAME,
-//   (SELECT (JSON_OBJECT_AGG
-//       (ANSWERS.ID,JSON_BUILD_OBJECT(
-//           'id',ANSWERS.ID,
-//           'body',ANSWERS.BODY
-//           )
-//       )
-//       )
-//        FROM ANSWERS
-//       WHERE ANSWERS.QUESTION_ID = QUESTIONS.ID
-//   ) AS ANSWER,
-//   (SElECT coalesce(json_agg(json_build_object('id', photos.id, 'url', photos.url)), '[]') FROM photos WHERE photos.answer_id = answers.id) AS photo
-// FROM QUESTIONS left join answers on questions.id = answers.question_id
-// WHERE QUESTIONS.PRODUCT_ID = $1)
-// SELECT question_id, JSON_AGG(JSON_BUILD_OBJECT(
-//               'question_id',question_id,
-//               'question_body', BODY,
-//               'answers', ANSWER,
-//               'photos', photo
-//               )) AS RESULTS
-// FROM QUESTIONANSWER
-// GROUP BY 1
 
 //Returns answers for a given question. This list does not include any reported answers. GET /qa/questions/:question_id/answers
 
@@ -123,7 +97,6 @@ const getAnswersForQuestion = (req, res) => {
 //Adds a question for the given product. POST /qa/questions
 
 const postQuestion = (req, res) => {
-  console.log(req.body);
   const body = req.body.question_body;
   const name = req.body.asker_name;
   const email = req.body.asker_email;
@@ -141,15 +114,15 @@ const postQuestion = (req, res) => {
 
 const postAnswerToQuestion = (req, res) => {
   const questionId = parseInt(req.params.question_id);
+  const photoId = req.body.photo_id;
   const body = req.body.body;
   const name = req.body.answerer_name;
   const email = req.body.answerer_email;
-  // const photos =
-  // const date = // ??
+  const date = Date.now();
   const reported = 0;
   const helpful = 0;
 
-  pool.query(`INSERT INTO answers (question_id, photo_id, body, date_written, answerer_name, answerer_email, reported, helpful) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)` [questionId, photos, body, date, name, email, reported, helpful]);
+  pool.query(`INSERT INTO answers (question_id, photo_id, body, date_written, answerer_name, answerer_email, reported, helpful) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)` [questionId, photoId, body, date, name, email, reported, helpful]);
 
 }
 
