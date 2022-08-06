@@ -8,6 +8,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+app.get('/loaderio-1cf71f8f894a2258324cbf5016a0c217', (req, res) => {
+  res.status(200).send('loaderio-1cf71f8f894a2258324cbf5016a0c217')
+});
 app.get('/qa/questions', db.getQuestionsForProduct);
 app.get('/qa/questions/:question_id/answers', db.getAnswersForQuestion);
 app.post('/qa/questions', db.postQuestion);
